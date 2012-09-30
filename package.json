@@ -1,0 +1,13 @@
+{
+  "name": "sartowall",
+  "description": "Sartorialist Node.js Experiment",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "express": "3.0.0rc4"
+    , "node.io": "0.4.12"
+    , "mongodb": "1.1.7"
+    , "stylus": ">= 0.0.1"
+    , "jade": ">= 0.0.1"
+  }
+}
