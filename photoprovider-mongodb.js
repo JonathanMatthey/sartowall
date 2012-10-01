@@ -22,7 +22,7 @@ PhotoProvider = function(host, port) {
 
       this.db = db;
 
-      database.addListener("error", function(error){
+      this.db.addListener("error", function(error){
         console.log("Error connecting to MongoLab");
       });
     });
