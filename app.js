@@ -4,8 +4,7 @@
 
 var express = require('express')
   , routes = require('./routes');
-var PhotoProvider = require('./articleprovider-memory').ArticleProvider;
-// var PhotoProvider = require('./photoprovider-memory').PhotoProvider;
+var PhotoProvider = require('./photoprovider-mongodb').PhotoProvider;
 var app = express();
 // var app = module.exports = express.createServer();
 

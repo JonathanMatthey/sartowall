@@ -4,8 +4,10 @@ var Server = require('mongodb').Server;
 var BSON = require('mongodb').BSON;
 var ObjectID = require('mongodb').ObjectID;
 
+var dbName = (process.env.MONGOLAB_URI != null ) ? process.env.MONGOLAB_URI : 'node-mongo-blog';
+
 ArticleProvider = function(host, port) {
-  this.db= new Db('node-mongo-blog', new Server(host, port, {auto_reconnect: true}, {}));
+  this.db= new Db(dbName, new Server(host, port, {auto_reconnect: true}, {}));
   this.db.open(function(){});
 };
 

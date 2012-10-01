@@ -1,3 +1,9 @@
+// heroku connect
+// var connect = require('connect');
+var mongo = require('mongodb');
+var database = null;
+
+// local connect
 var Db = require('mongodb').Db;
 var Connection = require('mongodb').Connection;
 var Server = require('mongodb').Server;
@@ -5,10 +11,28 @@ var BSON = require('mongodb').BSON;
 var ObjectID = require('mongodb').ObjectID;
 
 PhotoProvider = function(host, port) {
-  this.db= new Db('node-mongo-blog', new Server(host, port, {auto_reconnect: true}, {}));
-  this.db.open(function(){});
-};
+  // heroku connect
+  if (process.env.MONGOLAB_URI !== undefined ){
 
+    var mongostr = process.env.MONGOLAB_URI;
+
+    mongo.connect(mongostr, {}, function(error, db)
+    {       
+      console.log("connected, db: " + db);
+
+      this.db = db;
+
+      database.addListener("error", function(error){
+        console.log("Error connecting to MongoLab");
+      });
+    });
+  }
+  else{
+    // local connect
+    this.db= new Db('node-mongo-blog', new Server(host, port, {auto_reconnect: true}, {}));
+    this.db.open(function(){});
+  }
+};
 
 PhotoProvider.prototype.getCollection= function(callback) {
   this.db.collection('photos', function(error, photo_collection) {
@@ -28,7 +52,6 @@ PhotoProvider.prototype.findAll = function(callback) {
       }
     });
 };
-
 
 PhotoProvider.prototype.findById = function(id, callback) {
     this.getCollection(function(error, photo_collection) {
