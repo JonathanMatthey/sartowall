@@ -2,10 +2,22 @@ extends layout
 
 block mainContent
   h1= title
-  #articles
-    - each article in articles
-      div.article
-        div.created_at= article.created_at 
+  #photos.isotope
+    - each photo in photos
+      div.photo-wrapper.isotope-item
         div.title 
-          a(href="/blog/"+article._id)!= article.title
-        div.body= article.body
+          // a(href="/blog/"+photo._id)!= photo.title
+        a.photo-link(href="/blog/"+photo._id)
+          img.photo(src=photo.src, alt='')
+  #overlay
+  a#btn-settings(href="#") settings
+  #panel-settings
+    h2 SETTINGS / LIST OF SHIT TO DO
+    ul
+      li ratings ? 
+      li filter by popularity
+      li vote up
+      li subscribe for updates
+
+    a#btn-close-settings(href="#") close
+        

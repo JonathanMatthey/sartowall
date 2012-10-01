@@ -35,9 +35,10 @@ var photoProvider = new PhotoProvider('localhost', 27017);
 
 app.get('/', function(req, res){
     photoProvider.findAll( function(error,docs){
+      console.log(docs);
         res.render('index.jade', { 
-            title: 'Blog',
-            articles:docs
+            title: 'sartowall',
+            photos:docs
         });
     })
 });
@@ -59,11 +60,11 @@ app.post('/blog/new', function(req, res){
 });
 
 app.get('/blog/:id', function(req, res) {
-    photoProvider.findById(req.params.id, function(error, article) {
+    photoProvider.findById(req.params.id, function(error, photo) {
         res.render('blog_show.jade',
         { 
-            title: article.title,
-            article:article
+            title: photo.title,
+            photo:photo
         }
         );
     });

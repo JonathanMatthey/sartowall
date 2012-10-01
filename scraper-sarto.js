@@ -14,7 +14,7 @@ exports.job = new nodeio.Job(options, {
   run: function (keyword) {
     var self = this, results;
     // this.getHtml('http://www.google.com/search?q=' + encodeURIComponent(keyword), function (err, $) {
-    this.getHtml('www.thesartorialist.com', function (err, $) {
+    this.getHtml('www.thesartorialist.com/page/4/', function (err, $) {
       var photos = [];
       $('.size-full').each(function(image){
         photos.push({ src: image.attribs.src });
@@ -22,13 +22,16 @@ exports.job = new nodeio.Job(options, {
 
       // connect to DB
       mydb = new Db('node-mongo-blog', new Server('localhost', 27017, {auto_reconnect: true}, {}));
-      mydb.open(function(){});
-
-      savePhotos(photos, function(){
-        console.log('savephotos complete');
+      mydb.open(function(){
+        savePhotos(photos, function(error, photo_collection){
+          if( error ) 
+            console.log ('ERROR - do something ! couldnt save photos');
+          else{
+            mydb.close();
+            self.emit(photo_collection);
+          }
+        });
       });
-
-      this.emit(photos);
     });
   }
 });
@@ -41,7 +44,9 @@ function getPhotos(callback) {
 };
 
 function savePhotos(photos, callback) {
-    getPhotos(function(error, article_collection) {
+  console.log('photos');
+  console.log(photos);
+    getPhotos(function(error, photo_collection) {
       if( error ) callback(error)
       else {
         if( typeof(photos.length)=="undefined")
@@ -56,7 +61,7 @@ function savePhotos(photos, callback) {
           }
         }
 
-        article_collection.insert(photos, function() {
+        photo_collection.insert(photos, function() {
           callback(null, photos);
         });
       }
