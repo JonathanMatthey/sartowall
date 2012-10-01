@@ -20,6 +20,13 @@ $(document).ready(function() {
     });
   });
 
+  $("a.photo-link").click(function(evt){
+    evt.preventDefault();
+    $("#main-photo").attr('src',$(this).children('.photo').attr('src'));
+    $("#panel-photo").fadeIn(300);
+    $("#overlay").fadeIn(300,function(){
+    });
+  });
 
   $("#btn-close-settings").click(function(){
       $("#panel-settings").fadeOut(300);

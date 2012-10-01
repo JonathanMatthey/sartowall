@@ -100,6 +100,36 @@ h2 {
 #photos .photo-wrapper .body {
   background-color: #ffa;
 }
+#panel-photo {
+  display: none;
+  position: absolute;
+  top: 40px;
+  left: 200px;
+  width: 790px;
+  height: 600px;
+  background-color: #000;
+  z-index: 40;
+}
+#panel-photo #prev-photo,
+#panel-photo #next-photo {
+  font-size: 40px;
+  width: 100px;
+  color: #fff;
+  position: absolute;
+  top: 0;
+  line-height: 600px;
+}
+#panel-photo #prev-photo {
+  left: 0;
+}
+#panel-photo #next-photo {
+  right: 0;
+}
+#panel-photo #main-photo {
+  top: 10px;
+  left: 100px;
+  position: absolute;
+}
 /**** Isotope Filtering ****/
 .isotope-item {
   z-index: 2;

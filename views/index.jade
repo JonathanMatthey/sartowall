@@ -7,7 +7,8 @@ block mainContent
       div.photo-wrapper.isotope-item
         div.title 
           // a(href="/blog/"+photo._id)!= photo.title
-        a.photo-link(href="/blog/"+photo._id)
+        //- a.photo-link(href="/blog/"+photo._id)
+        a.photo-link(href="#")
           img.photo(src=photo.src, alt='')
   #overlay
   a#btn-settings(href="#") settings
@@ -20,4 +21,9 @@ block mainContent
       li subscribe for updates
 
     a#btn-close-settings(href="#") close
-        
+
+  #panel-photo
+    a#prev-photo(href="#") <
+    img#main-photo(src="")
+    a#next-photo(href="#") >
+  
