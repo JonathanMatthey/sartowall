@@ -85,7 +85,8 @@ app.use(function(err, req, res, next){
   res.send(500, 'Something broke!');
 });
 
-app.listen(3000, function(){
+var port = process.env.PORT || 3000;
+app.listen(port, function(){
   console.log("Express server listening on port 3000 in %s mode",  app.settings.env);
 });
 

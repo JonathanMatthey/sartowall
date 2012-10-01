@@ -14,7 +14,7 @@ exports.job = new nodeio.Job(options, {
   run: function (keyword) {
     var self = this, results;
     // this.getHtml('http://www.google.com/search?q=' + encodeURIComponent(keyword), function (err, $) {
-    this.getHtml('www.thesartorialist.com/page/4/', function (err, $) {
+    this.getHtml('www.thesartorialist.com/page/2/', function (err, $) {
       var photos = [];
       $('.size-full').each(function(image){
         photos.push({ src: image.attribs.src });
