@@ -79,6 +79,8 @@ h2 {
   margin-left: auto;
   margin-right: auto;
   z-index: 10;
+  -webkit-transition: -webkit-transform 0.5s ease-in, -webkit-transform-origin 0.5s ease-in;
+  -webkit-transform-origin: 500px 0px;
 }
 #photos .photo-wrapper {
   float: left;
@@ -99,6 +101,15 @@ h2 {
 }
 #photos .photo-wrapper .body {
   background-color: #ffa;
+}
+#photos.zoom-in {
+  -webkit-transform: scale(2);
+}
+#photos.zoomed-in {
+  -webkit-transition: -webkit-transform-origin 0.5s ease-in;
+}
+#photos.zoomed-in .selected .photo {
+  -webkit-filter: none;
 }
 #panel-photo {
   display: none;

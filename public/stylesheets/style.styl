@@ -6,6 +6,7 @@ body
   color #555
   background-color black
   margin 0
+  // overflow hidden
 
 a
   color white
@@ -76,6 +77,9 @@ h1, h2
   margin-left auto
   margin-right auto
   z-index 10
+  -webkit-transition -webkit-transform 0.5s ease-in, -webkit-transform-origin 0.5s ease-in
+  -webkit-transform-origin 500px 0px
+
   .photo-wrapper
     // margin 20px
     float left
@@ -94,6 +98,19 @@ h1, h2
       background-color #ffa
     // .photo
     //   width 300px
+
+#photos.zoom-in
+  -webkit-transform scale(2)
+
+#photos.zoomed-in
+  -webkit-transition -webkit-transform-origin 0.5s ease-in
+
+#photos.zoomed-in .photo
+  // -webkit-filter brightness(0%) sepia(80%)
+
+#photos.zoomed-in .selected .photo
+  -webkit-filter none
+
 #panel-photo
   display none
   position absolute
