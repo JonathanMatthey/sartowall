@@ -53,6 +53,20 @@ PhotoProvider.prototype.findAll = function(callback) {
     });
 };
 
+PhotoProvider.prototype.find = function(options, callback) {
+  console.log(options);
+  console.log('boom');
+    this.getCollection(function(error, photo_collection) {
+      if( error ) callback(error)
+      else {
+        photo_collection.find(options).toArray(function(error, results) {
+          if( error ) callback(error)
+          else callback(null, results)
+        });
+      }
+    });
+};
+
 PhotoProvider.prototype.findById = function(id, callback) {
     this.getCollection(function(error, photo_collection) {
       if( error ) callback(error)

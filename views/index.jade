@@ -1,7 +1,10 @@
 extends layout
 
 block mainContent
-  h1= title
+  header
+    h1= title
+    -if(r) 
+    div.selected-color(style="background-color:rgb(" + r + "," + g + "," + b + ")")
   #photos.isotope
     - each photo in photos
       div.photo-wrapper.isotope-item
@@ -11,11 +14,11 @@ block mainContent
         a.photo-link(href="#")
           img.photo(src=photo.src, alt='')
           div.colorways
-            div.colorway(style="background-color:"+photo.colors[0])
-            div.colorway(style="background-color:"+photo.colors[1])
-            div.colorway(style="background-color:"+photo.colors[2])
-            div.colorway(style="background-color:"+photo.colors[3])
-            div.colorway(style="background-color:"+photo.colors[4])
+            a.colorway(r=photo.colors[0].r,g=photo.colors[0].g,b=photo.colors[0].b,style="background-color:"+photo.colors[0].str)
+            a.colorway(r=photo.colors[1].r,g=photo.colors[1].g,b=photo.colors[1].b,style="background-color:"+photo.colors[1].str)
+            a.colorway(r=photo.colors[2].r,g=photo.colors[2].g,b=photo.colors[2].b,style="background-color:"+photo.colors[2].str)
+            a.colorway(r=photo.colors[3].r,g=photo.colors[3].g,b=photo.colors[3].b,style="background-color:"+photo.colors[3].str)
+            a.colorway(r=photo.colors[4].r,g=photo.colors[4].g,b=photo.colors[4].b,style="background-color:"+photo.colors[4].str)
   #overlay
   a#btn-settings(href="#") settings
   #panel-settings

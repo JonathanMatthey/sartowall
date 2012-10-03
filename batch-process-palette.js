@@ -5,7 +5,7 @@ var BSON = require('mongodb').BSON;
 var ObjectID = require('mongodb').ObjectID;
 
 var nodeio = require('node.io');
-var options = {timeout: 200}
+var options = {timeout: 500}
   , http = require('http')
   , url = require('url');
 
@@ -26,6 +26,9 @@ var self;
 
 var photoCollection;
 
+var totalPhotos = 0;
+var photosProcessedCount = 0 ;
+
 exports.job = new nodeio.Job(options, {
   input: ['hello'],
   run: function (keyword) {
@@ -34,13 +37,14 @@ exports.job = new nodeio.Job(options, {
     // connect to DB
     mydb = new Db('node-mongo-blog', new Server('localhost', 27017, {auto_reconnect: true}, {}));
     mydb.open(function(){
-      console.log('open');
 
       mydb.collection('photos', function(error, photo_collection){
         photoCollection = photo_collection;
         cursor = photo_collection.find({});
-
-        processNextPhoto();
+        cursor.count(function(err, count) {
+          totalPhotos = count;
+          processNextPhoto();
+        });
       });
     });
   }
@@ -52,7 +56,6 @@ function processNextPhoto(){
     if(err) throw err;
 
     if(photo !== null){
-      console.log ('paletting this img ' + photo.src);
       paletteImg(photo);
     }
     else {
@@ -95,17 +98,18 @@ function paletteImg(photo){
             , b = color[2]
             , val = r << 16 | g << 8 | b
             , str = '#' + val.toString(16);
-            colorsArray.push(str);
+            colorsArray.push({"r" : r, "g" : g, "b" : b, "str" : str});
         });
 
         photo.colors = colorsArray;
 
-        console.log(photo);
+        // console.log(photo);
 
         // Update the document using an upsert operation, ensuring creation if it does not exist
         photoCollection.update({_id:photo._id}, photo, {upsert:true, safe:true}, function(err, result) {
 
-          console.log('update complete');
+          photosProcessedCount ++;
+          console.log('[ ' + photosProcessedCount + ' / ' + totalPhotos + ' ] photo saved: ' +  path);
           processNextPhoto();
 
         });

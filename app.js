@@ -42,6 +42,29 @@ app.get('/', function(req, res){
     })
 });
 
+app.get('/color/r/:r/g/:g/b/:b', function(req, res){
+   var  r = parseInt(req.params.r,10),
+        g = parseInt(req.params.g,10),
+        b = parseInt(req.params.b,10);
+
+    var colorAccuracy = 1;
+
+    photoProvider.find(
+      {
+        "colors.r": {$gt:r-colorAccuracy, $lt:r+colorAccuracy},
+        "colors.g": {$gt:g-colorAccuracy, $lt:g+colorAccuracy},
+        "colors.b": {$gt:b-colorAccuracy, $lt:b+colorAccuracy}
+      },function(err, docs){
+        res.render('index.jade', { 
+            title: 'sartowall',
+            photos:docs,
+            r:r,
+            g:g,
+            b:b
+        });
+    });
+});
+
 app.get('/blog/new', function(req, res) {
     res.render('blog_new.jade', { 
         title: 'New Post'
@@ -88,6 +111,3 @@ var port = process.env.PORT || 3000;
 app.listen(port, function(){
   console.log("Express server listening on port %d in %s mode",  port, app.settings.env);
 });
-
-
-

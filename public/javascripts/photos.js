@@ -37,4 +37,8 @@ $(document).ready(function() {
     $("#overlay").fadeOut(300,function(){
     });
   })
+
+  $("a.colorway").click(function(){
+    window.location.href = "/color/r/"+$(this).attr('r')+"/g/"+$(this).attr('g')+"/b/"+$(this).attr('b');
+  })
 });
