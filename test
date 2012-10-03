@@ -1,33 +1,61 @@
-#!/usr/bin/env node
 
 var palette = require('palette')
   , fs = require('fs')
   , Canvas = require('canvas')
-  , Image = Canvas.Image
+  // , Image = Canvas.Image
   , canvas = new Canvas
   , ctx = canvas.getContext('2d')
   , path = process.argv[2]
   , n = ~~process.argv[3] || 5
-  , out = '/tmp/out.png';
+  , http = require('http')
+  , out = '/tmp/out.png'
+  , url = require('url');
 
-if (!path) {
-  console.error('Usage: test <image> [colors]');
-  process.exit(1);
-}
+var outCanvas = new Canvas(1000, 750);
+var ctx = outCanvas.getContext('2d');
 
-var img = new Image;
+http.get(
+    {
+        host: 'images.thesartorialist.com',
+        port: 80,
+        path: '/thumbnails/2012/09/92712GD3290Web.jpg'
+    },
+    function(res) {
+      var data = new Buffer(parseInt(res.headers['content-length'],10));
+      var pos = 0;
+      res.on('data', function(chunk) {
+        chunk.copy(data, pos);
+        pos += chunk.length;
+      });
+      res.on('end', function () {
+        img = new Canvas.Image;
+        img.src = data;
+        ctx.drawImage(img, 0, 0, img.width, img.height);
+        // var x = 0;
+        var colorsString = "";
+        var colors = palette(outCanvas, n);
+        colors.forEach(function(color){
+          var r = color[0]
+            , g = color[1]
+            , b = color[2]
+            , val = r << 16 | g << 8 | b
+            , str = '#' + val.toString(16);
+            colorsString += str + " ";
+        });
+        console.log('photo colors: '+ colorsString);
 
-img.onload = function(){
-  canvas.width = img.width;
-  canvas.height = img.height + 50;
-  ctx.fillStyle = 'white';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.drawImage(img, 0, 0);
-  paintPalette();
-  save();
-};
+        // var out = fs.createWriteStream(__dirname + '/my-out.png')
+        //   , stream = outCanvas.createPNGStream();
 
-img.src = path;
+        // stream.on('data', function(chunk){
+        //   out.write(chunk);
+        // });
+      });
+    }
+);
+
+// console.log(img.src);
+// setTimeout(function(){console.log(img.complete);}, 10000);
 
 function paintPalette() {
   var x = 0;

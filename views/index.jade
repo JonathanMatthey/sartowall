@@ -1,7 +1,7 @@
 extends layout
 
 block mainContent
-  //- h1= title
+  h1= title
   #photos.isotope
     - each photo in photos
       div.photo-wrapper.isotope-item
@@ -10,6 +10,12 @@ block mainContent
         //- a.photo-link(href="/blog/"+photo._id)
         a.photo-link(href="#")
           img.photo(src=photo.src, alt='')
+          div.colorways
+            div.colorway(style="background-color:"+photo.colors[0])
+            div.colorway(style="background-color:"+photo.colors[1])
+            div.colorway(style="background-color:"+photo.colors[2])
+            div.colorway(style="background-color:"+photo.colors[3])
+            div.colorway(style="background-color:"+photo.colors[4])
   #overlay
   a#btn-settings(href="#") settings
   #panel-settings
