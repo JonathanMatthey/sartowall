@@ -24,10 +24,11 @@ var mydb;
 
 var self;
 
-var photoCollection;
+var postsCollection;
 
 var totalPhotos = 0;
 var photosProcessedCount = 0 ;
+var photosToProcessArray = [];
 
 exports.job = new nodeio.Job(options, {
   input: ['hello'],
@@ -38,9 +39,9 @@ exports.job = new nodeio.Job(options, {
     mydb = new Db('node-mongo-blog', new Server('localhost', 27017, {auto_reconnect: true}, {}));
     mydb.open(function(){
 
-      mydb.collection('photos', function(error, photo_collection){
-        photoCollection = photo_collection;
-        cursor = photo_collection.find({});
+      mydb.collection('posts', function(error, posts_collection){
+        postsCollection = posts_collection;
+        cursor = posts_collection.find({});
         cursor.count(function(err, count) {
           totalPhotos = count;
           processNextPhoto();
@@ -50,24 +51,39 @@ exports.job = new nodeio.Job(options, {
   }
 });
 
-function processNextPhoto(){
-  cursor.nextObject(function(err, photo) {
+function processNextPost(){
+
+  cursor.nextObject(function(err, post) {
 
     if(err) throw err;
 
-    if(photo !== null){
-      paletteImg(photo);
+    if(post !== null){
+      photosToProcessArray = post.photos;
+      processNextPhoto(post);
     }
     else {
       mydb.close();
       self.emit('JOB DONE - GO HOME !')
     }
   });
+
 }
 
-function paletteImg(photo){
+function processNextPhoto(post){
+  if(photosToProcessArray.length !== 0){
+    paletteImg(post, photosToProcessArray.pop());
+  }
+  else {
+    // save post here 
+    console.log(post);
+    // move on to next post
+    processNextPost();
+  }
+}
 
-  var regexGroups = photo.src.match(/^((http[s]?|ftp):\/)?\/?([^:\/\s]+)((\/\w+)*\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$/);
+function paletteImg(post, photo){
+
+  var regexGroups = photoUrl.match(/^((http[s]?|ftp):\/)?\/?([^:\/\s]+)((\/\w+)*\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$/);
 
   var host = regexGroups[3]; 
   var path = regexGroups[4] + regexGroups[6];
@@ -105,15 +121,6 @@ function paletteImg(photo){
 
         // console.log(photo);
 
-        // Update the document using an upsert operation, ensuring creation if it does not exist
-        photoCollection.update({_id:photo._id}, photo, {upsert:true, safe:true}, function(err, result) {
-
-          photosProcessedCount ++;
-          console.log('[ ' + photosProcessedCount + ' / ' + totalPhotos + ' ] photo saved: ' +  path);
-          processNextPhoto();
-
-        });
-
         // var out = fs.createWriteStream(__dirname + '/my-out.png')
         //   , stream = outCanvas.createPNGStream();
 
@@ -123,34 +130,8 @@ function paletteImg(photo){
       });
     }
 );
-
-
 }
 
-function savePhotos(photos, callback) {
-  console.log('photos');
-  console.log(photos);
-    getPhotos(function(error, photo_collection) {
-      if( error ) callback(error)
-      else {
-        if( typeof(photos.length)=="undefined")
-          photos = [photos];
-
-        for( var i =0;i< photos.length;i++ ) {
-          photo = photos[i];
-          photo.created_at = new Date();
-          if( photo.comments === undefined ) photo.comments = [];
-          for(var j =0;j< photo.comments.length; j++) {
-            photo.comments[j].created_at = new Date();
-          }
-        }
-
-        photo_collection.insert(photos, function() {
-          callback(null, photos);
-        });
-      }
-    });
-};
 
 // load photo collection from mongodb
 

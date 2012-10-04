@@ -23,6 +23,8 @@ $(document).ready(function() {
     $("#photos").addClass('zoom-in');
     $(".selected").removeClass('selected');
     $(this).parent().addClass('selected');
+    $(".post-details").hide();
+    $(".post-details."+$(this).data('post-id').substring(1,$(this).data('post-id').length-1)).show();
 
     setTimeout(function(){
       $("#photos").addClass('zoomed-in');

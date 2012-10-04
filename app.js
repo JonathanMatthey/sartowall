@@ -37,7 +37,7 @@ app.get('/', function(req, res){
       console.log(docs);
         res.render('index.jade', { 
             title: 'sartowall',
-            photos:docs
+            posts:docs
         });
     })
 });
@@ -51,13 +51,13 @@ app.get('/color/r/:r/g/:g/b/:b', function(req, res){
 
     photoProvider.find(
       {
-        "colors.r": {$gt:r-colorAccuracy, $lt:r+colorAccuracy},
-        "colors.g": {$gt:g-colorAccuracy, $lt:g+colorAccuracy},
-        "colors.b": {$gt:b-colorAccuracy, $lt:b+colorAccuracy}
-      },function(err, docs){
+        "photos.colors.r": {$gt:r-colorAccuracy, $lt:r+colorAccuracy},
+        "photos.colors.g": {$gt:g-colorAccuracy, $lt:g+colorAccuracy},
+        "photos.colors.b": {$gt:b-colorAccuracy, $lt:b+colorAccuracy}
+      },function(err, posts){
         res.render('index.jade', { 
             title: 'sartowall',
-            photos:docs,
+            posts:posts,
             r:r,
             g:g,
             b:b

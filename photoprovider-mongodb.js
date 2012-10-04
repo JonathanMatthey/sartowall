@@ -35,7 +35,7 @@ PhotoProvider = function(host, port) {
 };
 
 PhotoProvider.prototype.getCollection= function(callback) {
-  this.db.collection('photos', function(error, photo_collection) {
+  this.db.collection('posts', function(error, photo_collection) {
     if( error ) callback(error);
     else callback(null, photo_collection);
   });

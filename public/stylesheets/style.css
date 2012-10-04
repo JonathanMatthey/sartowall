@@ -146,29 +146,27 @@ h1 {
   height: 100%;
   border: 1px solid #00f;
 }
-#side-panel .details {
-  position: absolute;
-  top: 0;
-  right: 0;
-  background-color: #000;
-  z-index: 19;
-  width: 20%;
-  height: 100%;
-  left: 100%;
-  display: none;
-}
-#side-panel .details .photo-title {
-  margin: 5px;
+#side-panel .post-details {
   color: #fff;
 }
-#side-panel .details .colorways {
+#side-panel .post-details .post-title {
+  padding-top: 30px;
+  margin-bottom: 100px;
+  font-size: 20px;
+}
+#side-panel .post-details .comments dd {
+  margin: 0px 0;
+  padding: 10px 0;
+  border-top: 1px solid #333;
+}
+#side-panel .post-details .colorways {
   width: 100px;
   height: 20px;
   position: absolute;
   bottom: 5px;
   right: 5px;
 }
-#side-panel .details .colorway {
+#side-panel .post-details .colorway {
   width: 20px;
   height: 20px;
   float: left;
