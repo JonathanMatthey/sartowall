@@ -1,5 +1,5 @@
 $(document).ready(function() {
-  $('img.photo').attr('width',($(window).width() - 8) /8 );
+  $('img.photo').attr('width',($("#container").width() - 20) /8 );
 
   $('img.photo').imagesLoaded( function( $images, $proper, $broken ) {
     $('#photos').isotope({
@@ -16,13 +16,14 @@ $(document).ready(function() {
 
   $("a.photo-link").click(function(evt){
     evt.preventDefault();
-    var leftOffset = $(this).parent().position().left - ($(".zoomed-in").width() / 2 ) + ($(this).width());
+    var leftOffset = $(this).parent().position().left - ($(".zoomed-in").width() / 2 ) + ($(this).width() * 2);
     var topOffset = $(this).parent().position().top - ($(window).height() / 2 ) + ($(this).height());
     console.log(leftOffset + "px " + topOffset + "px ");
     $("#photos").css('-webkit-transform-origin', leftOffset + "px " + topOffset + "px ");
     $("#photos").addClass('zoom-in');
     $(".selected").removeClass('selected');
-    $(this).addClass('selected');
+    $(this).parent().addClass('selected');
+
     setTimeout(function(){
       $("#photos").addClass('zoomed-in');
     }, 500);
@@ -42,3 +43,9 @@ $(document).ready(function() {
     window.location.href = "/color/r/"+$(this).attr('r')+"/g/"+$(this).attr('g')+"/b/"+$(this).attr('b');
   })
 });
+
+
+function showPhotoDetails($photoLink){
+  $("#photo-details").show();
+
+}

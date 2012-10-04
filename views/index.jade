@@ -5,20 +5,31 @@ block mainContent
     h1= title
     -if(r) 
     div.selected-color(style="background-color:rgb(" + r + "," + g + "," + b + ")")
-  #photos.isotope
-    - each photo in photos
-      div.photo-wrapper.isotope-item
-        div.title 
-          // a(href="/blog/"+photo._id)!= photo.title
-        //- a.photo-link(href="/blog/"+photo._id)
-        a.photo-link(href="#")
-          img.photo(src=photo.src, alt='')
-          div.colorways
-            a.colorway(r=photo.colors[0].r,g=photo.colors[0].g,b=photo.colors[0].b,style="background-color:"+photo.colors[0].str)
-            a.colorway(r=photo.colors[1].r,g=photo.colors[1].g,b=photo.colors[1].b,style="background-color:"+photo.colors[1].str)
-            a.colorway(r=photo.colors[2].r,g=photo.colors[2].g,b=photo.colors[2].b,style="background-color:"+photo.colors[2].str)
-            a.colorway(r=photo.colors[3].r,g=photo.colors[3].g,b=photo.colors[3].b,style="background-color:"+photo.colors[3].str)
-            a.colorway(r=photo.colors[4].r,g=photo.colors[4].g,b=photo.colors[4].b,style="background-color:"+photo.colors[4].str)
+  #container
+    #photos.isotope
+      - each photo in photos
+        div.photo-wrapper.isotope-item
+          div.title 
+            // a(href="/blog/"+photo._id)!= photo.title
+          //- a.photo-link(href="/blog/"+photo._id)
+          a.photo-link(href="#")
+            img.photo(src=photo.src, alt='')
+          //- div.details
+          //-   div.photo-title On the Street... Avenue Winston Churchill, Paris
+          //-   div.comments-wrapper
+          //-   div.colorways
+          //-     a.colorway(r=photo.colors[0].r,g=photo.colors[0].g,b=photo.colors[0].b,style="background-color:"+photo.colors[0].str)
+          //-     a.colorway(r=photo.colors[1].r,g=photo.colors[1].g,b=photo.colors[1].b,style="background-color:"+photo.colors[1].str)
+          //-     a.colorway(r=photo.colors[2].r,g=photo.colors[2].g,b=photo.colors[2].b,style="background-color:"+photo.colors[2].str)
+          //-     a.colorway(r=photo.colors[3].r,g=photo.colors[3].g,b=photo.colors[3].b,style="background-color:"+photo.colors[3].str)
+          //-     a.colorway(r=photo.colors[4].r,g=photo.colors[4].g,b=photo.colors[4].b,style="background-color:"+photo.colors[4].str)
+  #side-panel
+    div.details
+      div.photo-title On the Street... Avenue Winston Churchill, Paris
+      div.comments-container
+      div.colorways
+
+
   #overlay
   a#btn-settings(href="#") settings
   #panel-settings

@@ -40,6 +40,13 @@ h1
   width 80px
   height 24px
 
+#container
+  width 90%
+  height 100%
+  position absolute
+  top 0
+  left 0
+  overflow-y scroll
 
 #overlay
   width 100%
@@ -101,6 +108,7 @@ h1
   -webkit-transform-origin 500px 0px
 
   .photo-wrapper
+    z-index 99
     // margin 20px
     float left
     position relative
@@ -109,23 +117,52 @@ h1
       margin 0
       padding 0
       line-height 0
+      .photo
+        -webkit-transition: all .2s ease-in-out;
     .created_at
       display none
-    .title
-      font-weight bold
-      text-decoration underline
-      background-color #eee
-    .body
-      background-color #ffa
-    // .photo
-    //   width 300px
+
+  .photo-wrapper.selected
+    z-index 999999
+    -moz-box-shadow:    6px 6px 10px 12px #000;
+    -webkit-box-shadow: 6px 6px 10px 12px #000;
+    box-shadow:         6px 6px 10px 12px #000;
+    .details
+      display block
+      -webkit-transform scale(1.1)
+
+
+#side-panel
+  position absolute
+  top 0
+  right 0
+  background-color black
+  z-index 19
+  width 10%
+  height 100%
+  border 1px solid blue
+
+  .details
+    position absolute
+    top 0
+    right 0
+    background-color black
+    z-index 19
+    width 20%
+    height 100%
+    left 100%
+    display none      
+    .photo-title
+      margin 5px
+      color white
+
     .colorways
       // display none
       width 100px
       height 20px
       position absolute
-      bottom 0
-      left 0
+      bottom 5px
+      right 5px
     .colorway
       width 20px
       height 20px
@@ -140,10 +177,11 @@ h1
     display block
 
 #photos.zoomed-in .photo
-  // -webkit-filter brightness(0%) sepia(80%)
+  -webkit-filter brightness(-10%)
 
 #photos.zoomed-in .selected .photo
   -webkit-filter none
+  -webkit-transform scale(1.2)
 
 #panel-photo
   display none
