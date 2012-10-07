@@ -26,7 +26,27 @@ var runOptions;
     input: function(start, num, callback) {
       var self = this;
 
-      mydb = new Db('node-mongo-blog', new Server('localhost', 27017, {auto_reconnect: true}, {}));
+  // heroku connect
+  if (process.env.MONGOLAB_URI !== undefined ){
+
+    var mongostr = process.env.MONGOLAB_URI;
+
+    mongo.connect(mongostr, {}, function(error, db)
+    {       
+      console.log("connected, db: " + db);
+
+      mydb = db;
+
+      mydb.addListener("error", function(error){
+        console.log("Error connecting to MongoLab");
+      });
+    });
+  }
+  else{
+    // local connect
+    mydb= new Db('node-mongo-blog', new Server('localhost', 27017, {auto_reconnect: true}, {}));
+  }
+
       mydb.open(function(){
 
         if(start !== 0) return false; // We only want the input method to run once
