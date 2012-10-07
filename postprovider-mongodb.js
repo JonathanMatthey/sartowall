@@ -10,7 +10,7 @@ var Server = require('mongodb').Server;
 var BSON = require('mongodb').BSON;
 var ObjectID = require('mongodb').ObjectID;
 
-PhotoProvider = function(host, port) {
+PostProvider = function(host, port) {
   // heroku connect
   if (process.env.MONGOLAB_URI !== undefined ){
 
@@ -34,14 +34,14 @@ PhotoProvider = function(host, port) {
   }
 };
 
-PhotoProvider.prototype.getCollection= function(callback) {
+PostProvider.prototype.getCollection= function(callback) {
   this.db.collection('posts', function(error, photo_collection) {
     if( error ) callback(error);
     else callback(null, photo_collection);
   });
 };
 
-PhotoProvider.prototype.findAll = function(callback) {
+PostProvider.prototype.findAll = function(callback) {
     this.getCollection(function(error, photo_collection) {
       if( error ) callback(error)
       else {
@@ -53,7 +53,7 @@ PhotoProvider.prototype.findAll = function(callback) {
     });
 };
 
-PhotoProvider.prototype.find = function(options, callback) {
+PostProvider.prototype.find = function(options, callback) {
   console.log(options);
   console.log('boom');
     this.getCollection(function(error, photo_collection) {
@@ -67,7 +67,7 @@ PhotoProvider.prototype.find = function(options, callback) {
     });
 };
 
-PhotoProvider.prototype.findById = function(id, callback) {
+PostProvider.prototype.findById = function(id, callback) {
     this.getCollection(function(error, photo_collection) {
       if( error ) callback(error)
       else {
@@ -79,7 +79,7 @@ PhotoProvider.prototype.findById = function(id, callback) {
     });
 };
 
-PhotoProvider.prototype.save = function(photos, callback) {
+PostProvider.prototype.save = function(photos, callback) {
     this.getCollection(function(error, photo_collection) {
       if( error ) callback(error)
       else {
@@ -102,4 +102,4 @@ PhotoProvider.prototype.save = function(photos, callback) {
     });
 };
 
-exports.PhotoProvider = PhotoProvider;
+exports.PostProvider = PostProvider;

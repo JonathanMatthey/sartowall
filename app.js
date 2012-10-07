@@ -4,7 +4,7 @@
 
 var express = require('express')
   , routes = require('./routes');
-var PhotoProvider = require('./photoprovider-mongodb').PhotoProvider;
+var PostProvider = require('./postprovider-mongodb').PostProvider;
 var app = express();
 // var app = module.exports = express.createServer();
 
@@ -30,11 +30,11 @@ app.configure('production', function(){
 
 // Routes
 
-// var photoProvider= new PhotoProvider();
-var photoProvider = new PhotoProvider('localhost', 27017);
+// var postProvider= new PostProvider();
+var postProvider = new PostProvider('localhost', 27017);
 
 app.get('/', function(req, res){
-    photoProvider.findAll( function(error,docs){
+    postProvider.findAll( function(error,docs){
       // console.log(docs);
         res.render('index.jade', { 
             title: 'sartowall',
@@ -50,7 +50,7 @@ app.get('/color/r/:r/g/:g/b/:b', function(req, res){
 
     var colorAccuracy = 1;
 
-    photoProvider.find(
+    postProvider.find(
       {
         "photos.colors.r": {$gt:r-colorAccuracy, $lt:r+colorAccuracy},
         "photos.colors.g": {$gt:g-colorAccuracy, $lt:g+colorAccuracy},
@@ -74,7 +74,7 @@ app.get('/blog/new', function(req, res) {
 });
 
 app.post('/blog/new', function(req, res){
-    photoProvider.save({
+    postProvider.save({
         title: req.param('title'),
         body: req.param('body')
     }, function( error, docs) {
@@ -83,7 +83,7 @@ app.post('/blog/new', function(req, res){
 });
 
 app.get('/blog/:id', function(req, res) {
-    photoProvider.findById(req.params.id, function(error, photo) {
+    postProvider.findById(req.params.id, function(error, photo) {
         res.render('blog_show.jade',
         { 
             title: photo.title,
@@ -94,7 +94,7 @@ app.get('/blog/:id', function(req, res) {
 });
 
 app.post('/blog/addComment', function(req, res) {
-    photoProvider.addCommentToArticle(req.param('_id'), {
+    postProvider.addCommentToArticle(req.param('_id'), {
         person: req.param('person'),
         comment: req.param('comment'),
         created_at: new Date()
