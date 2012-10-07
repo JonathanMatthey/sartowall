@@ -6,7 +6,7 @@ var ObjectID = require('mongodb').ObjectID;
 var moment = require('moment');
 
 var nodeio = require('node.io');
-var options = {benchmark: true, max: 50, timeout: 10};
+var options = {benchmark: true, max: 2, timeout: 10};
 var http = require('http')
   , url = require('url');
 
@@ -53,22 +53,30 @@ var runOptions;
                   // figure out if xml is ascending or descending
                   var firstDate = moment($lastmodDates[0].children[0].data);
                   var lastDate = moment($lastmodDates[$lastmodDates.length-1].children[0].data);
-                  var blogLastModifiedDate = moment(blog.lastModifiedDate);
+                  var lastScrapedDate = moment(blog.lastScrapedDate);
 
-                  if (firstDate.diff(blogLastModifiedDate,'days') > 0 )
+                  if (firstDate.diff(lastScrapedDate,'days') > 0 )
                   {
                     i = $lastmodDates.length-1;
                     // sitemap is in descending order
 
                   }
 
-                  if (lastDate.diff(blogLastModifiedDate,'days') > 0 )
+                  if (lastDate.diff(lastScrapedDate) >= 0 )
                   {
                     // sitemap is in ascending order
                     i = $lastmodDates.length-1;
 
                     // check for changes newer than last checked date for this blog
-                    while( i >= 0 && lastDate.diff(blogLastModifiedDate,'days') > 0){
+                    while( i >= 0 && lastDate.diff(lastScrapedDate) >= 0 ){
+
+                      // // check if post 
+                      // var url = $postLinks[i].children[0].data;
+                      // postCollection.findOne({url: url}, function(error, result) {
+                      //   if( error ) callback(error)
+                      //   else{
+                      //     if (result == null){
+
                       runOptions = clone(blog);
                       runOptions.url = $postLinks[i].children[0].data;
                       callback([ runOptions ]);
@@ -76,14 +84,17 @@ var runOptions;
                       lastDate = moment($lastmodDates[i].children[0].data);
                     }
                   }
+                  // update blog last modified date to now as we just checked it
+                  blog.lastScrapedDate = moment().format("YYYY-MM-DDTHH:mm:ss z");
+                  blogCollection.update({_id: blog._id}, blog, {safe:true}, function(err, result) {
+                    console.log('= blog saved');
+                    callback(null,false);
+                  });
 
-                  callback(null, false);
                 });
-
               }
               else {
-                mydb.close();
-                self.emit('JOB DONE - GO HOME !')
+                self.emit('NO MORE BLOGS - GO HOME !')
               }
             });
 
@@ -164,11 +175,10 @@ var runOptions;
 
                     // Update the document using an upsert operation, ensuring creation if it does not exist
                     postCollection.update({_id: post._id}, post, {upsert:true, safe:true}, function(err, result) {
-                      console.log('post saved');
+                      console.log('= post saved');
                       self.emit('done !');
                     });
                 });
-
               }
             });
           }
@@ -178,6 +188,7 @@ var runOptions;
     },
     output: function (lines) {
       // write_stream.write(lines.join('\n'));
+      mydb.close();
     }
   });
 

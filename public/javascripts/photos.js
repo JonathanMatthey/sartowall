@@ -1,5 +1,5 @@
 $(document).ready(function() {
-  $('img.photo').attr('width',($("#container").width() - 20) /8 );
+  $('img.photo').attr('width',($("#container").width() - 45) /4 );
 
   $('img.photo').imagesLoaded( function( $images, $proper, $broken ) {
     $('#photos').isotope({

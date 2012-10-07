@@ -1,17 +1,9 @@
-var nodeio = require('node.io')
+var nodeio = require('node.io');
 
+console.log('worker started');
 
-
-nodeio.start('scraper-manrep.js', {}, 
+nodeio.start('blog-scraper.js', {}, 
 function(err, output){
   console.log('callback - MANREP - done ');
-  process.exit(code=0)
-}
-, false);
-
-nodeio.start('scraper-lookbooknu.js', {}, 
-function(err, output){
-  console.log('callback - lookbook - done ');
-  process.exit(code=0)
 }
 , false);

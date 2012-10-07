@@ -28,10 +28,6 @@ app.configure('production', function(){
 });
 
 
-// scraping jobs
-
-node.io scraper-manrep.js
-
 // Routes
 
 // var photoProvider= new PhotoProvider();
@@ -39,7 +35,7 @@ var photoProvider = new PhotoProvider('localhost', 27017);
 
 app.get('/', function(req, res){
     photoProvider.findAll( function(error,docs){
-      console.log(docs);
+      // console.log(docs);
         res.render('index.jade', { 
             title: 'sartowall',
             posts:docs
