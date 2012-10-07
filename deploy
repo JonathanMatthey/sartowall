@@ -1,6 +1,4 @@
 heroku destroy --confirm sartowall
 heroku create sartowall --stack cedar
-heroku config:add LD_PRELOAD='/app/node_modules/canvas/cairo/libcairo.so /app/node_modules/canvas/lib/libpixman-1.so.0 /app/node_modules/canvas/lib/libfreetype.so.6' --app sartowall
-heroku config:add LD_LIBRARY_PATH'=/app/node_modules/canvas/cairo' --app sartowall
 heroku config:add BUILDPACK_URL=git://github.com/bloomtime/heroku-buildpack-nodejs.git#cairo
 git push heroku master
