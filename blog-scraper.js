@@ -22,9 +22,6 @@ var async = require('async');
 
 var runOptions;
 
-
-// for each sitemap - 
-
   exports.job = new nodeio.Job(options, {
     input: function(start, num, callback) {
       var self = this;
@@ -50,22 +47,36 @@ var runOptions;
                   var $lastmodDates = $("lastmod");
                   var postLinksCount = $postLinks.length;
                   var i;
+                  console.log("- found " + postLinksCount + " posts");
+                  console.log("- found " + $lastmodDates.length + " moddates");
 
                   // figure out if xml is ascending or descending
+                  var firstDate = moment($lastmodDates[0].children[0].data);
+                  var lastDate = moment($lastmodDates[$lastmodDates.length-1].children[0].data);
+                  var blogLastModifiedDate = moment(blog.lastModifiedDate);
 
-                  var date1 = moment($lastmodDates[0].children[0].data);
-                  var date2 = moment($lastmodDates[1].children[0].data);
-                  console.log(date1.diff(date2));
-                  var sitemapOrder = (date1.diff(date2) > 0) ? "asc": "desc";
-                  console.log(sitemapOrder);
+                  if (firstDate.diff(blogLastModifiedDate,'days') > 0 )
+                  {
+                    i = $lastmodDates.length-1;
+                    // sitemap is in descending order
 
-                  console.log("- found " + postLinksCount + " posts");
-                  for (i=postLinksCount - 1; i > postLinksCount - 4; i--){
-                    runOptions = clone(blog);
-                    runOptions.postUrl = $postLinks[i].children[0].data;
-                    // console.log(blog);
-                    callback([ runOptions ]);
                   }
+
+                  if (lastDate.diff(blogLastModifiedDate,'days') > 0 )
+                  {
+                    // sitemap is in ascending order
+                    i = $lastmodDates.length-1;
+
+                    // check for changes newer than last checked date for this blog
+                    while( i >= 0 && lastDate.diff(blogLastModifiedDate,'days') > 0){
+                      runOptions = clone(blog);
+                      runOptions.url = $postLinks[i].children[0].data;
+                      callback([ runOptions ]);
+                      i--;
+                      lastDate = moment($lastmodDates[i].children[0].data);
+                    }
+                  }
+
                   callback(null, false);
                 });
 
@@ -86,62 +97,82 @@ var runOptions;
 
       var self = this;
 
-      console.log("> scraping: " + options.postUrl);
+      console.log("> scraping: " + options.url);
 
-      this.getHtml(options.postUrl, function(err, $) {
+      this.getHtml(options.url, function(err, $) {
         if (err) {
           console.log("ERROR", err);
           self.retry();
         }
         else {
 
-          var post = {}; 
-          post.photos = [];
-          post.comments = [];
+          mydb.collection('posts', {}, function(error, postCollection) {
+          if( error ) callback(error);
+          else {
+            postCollection.findOne({url: options.url}, function(error, result) {
+              if( error ) callback(error)
+              else{
+                if (result == null){
+                  var post = {};
+                  post.photos = [];
+                  post.comments = [];
+                }
+                else
+                {
+                  var post = result;
+                }
+                post.url = options.url;
 
-          // scrape comments function
-          try
-          {
-            console.log('> found title: ' + $(options.titleSelector).fulltext);
-            post.title = $(options.titleSelector).fulltext;
-          }
-          catch(err)
-          {
-          }
+                // scrape comments function
+                try
+                {
+                  console.log('> found title: ' + $(options.titleSelector).fulltext);
+                  post.title = $(options.titleSelector).fulltext;
+                }
+                catch(err)
+                {
+                }
 
-          // scrape comments function
-          try
-          {
-            console.log('> found comments: ' + $(options.commentSelector).length);
-            $(options.commentSelector).each(function(comment){
-              post.comments.push({ "body": stripOutURL(comment.text)});
+                // scrape comments function
+                try
+                {
+                  console.log('> found comments: ' + $(options.commentSelector).length);
+                  $(options.commentSelector).each(function(comment){
+                    post.comments.push({ "body": stripOutURL(comment.text)});
+                  });
+                }
+                catch(err)
+                {
+                }
+                
+                paletteFns = [];
+
+                console.log("> found photos: " + $(options.photoSelector).length);
+                $(options.photoSelector).each(function(img){
+                  // post.photos.push({src:img.attribs.src});
+                  paletteFns.push(function(callback){
+                    paletteImg(callback, {src:img.attribs.src});
+                  });
+                });
+
+                async.parallel(paletteFns,
+                //  callback when all paletteFns completed
+                function(err, results){
+                    // the results array will equal ['one','two'] even though
+                    // the second function had a shorter timeout.
+                    post.photos = results;
+
+                    // Update the document using an upsert operation, ensuring creation if it does not exist
+                    postCollection.update({_id: post._id}, post, {upsert:true, safe:true}, function(err, result) {
+                      console.log('post saved');
+                      self.emit('done !');
+                    });
+                });
+
+              }
             });
           }
-          catch(err)
-          {
-          }
-          
-          paletteFns = [];
-
-          console.log("> found photos: " + $(options.photoSelector).length);
-          $(options.photoSelector).each(function(img){
-            // post.photos.push({src:img.attribs.src});
-            paletteFns.push(function(callback){
-              paletteImg(callback, {src:img.attribs.src});
-            });
           });
-
-          async.parallel(paletteFns,
-          //  callback when all paletteFns completed
-          function(err, results){
-              // the results array will equal ['one','two'] even though
-              // the second function had a shorter timeout.
-              post.photos = results;
-              // console.log(post);
-              // savePost(function(){ console.log('post saved'); }, post);
-              self.emit('done !');
-          });
-
         }
       });
     },
@@ -216,46 +247,3 @@ function stripOutURL(text) {
     return replacedText.replace(exp, '');
 
 }
-
-function getPosts(callback) {
-  mydb.collection('posts', {}, function(error, post_collection) {
-    if( error ) callback(error);
-    else callback(null, post_collection);
-  });
-};
-
-function savePost(callback, post){
-  getPosts(function(error, post_collection) {
-    if( error ) callback(error)
-    else {
-      post_collection.insert(post, function() {
-        callback(null, post);
-      });
-    }
-  });
-}
-
-function savePhotos(photos, callback) {
-  console.log('photos');
-  console.log(photos);
-    getPhotos(function(error, photo_collection) {
-      if( error ) callback(error)
-      else {
-        if( typeof(photos.length)=="undefined")
-          photos = [photos];
-
-        for( var i =0;i< photos.length;i++ ) {
-          photo = photos[i];
-          photo.created_at = new Date();
-          if( photo.comments === undefined ) photo.comments = [];
-          for(var j =0;j< photo.comments.length; j++) {
-            photo.comments[j].created_at = new Date();
-          }
-        }
-
-        photo_collection.insert(photos, function() {
-          callback(null, photos);
-        });
-      }
-    });
-};
