@@ -39,6 +39,9 @@ var runOptions;
 
     mongo.connect(mongostr, {}, function(error, db)
     {       
+      console.log('error');
+      console.log(error);
+      console.log('db');
       console.log("connected, db: " + db);
 
       mydb = db;
