@@ -12,7 +12,7 @@
     , "async": ">= 0.1.22"
     , "moment": ">= 1.7.2"
     , "palette": ">= 0.0.1"
-    , "canvas-heroku":  "https://github.com/gabrielfalcao/node-canvas-heroku/tarball/master"
+    , "canvas-heroku":  "x"
   },
   "engines": {
     "node": "0.8.x"
