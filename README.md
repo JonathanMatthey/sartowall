@@ -51,3 +51,29 @@ GO LIKE ARTSY / P8 / ITS ART AT THE END OF THE DAY.
 - allow people to vote
 - allow people to register
 - save their preferred blogs
+
+
+
+heroku deploy:
+
+deploy:
+    -heroku destroy --confirm my-cool-app
+    -heroku create my-cool-app-name --stack cedar
+    -heroku addons:add redistogo:nano
+    -heroku addons:add custom_domains:basic
+    -heroku addons:add zerigo_dns:basic
+    -heroku domains:add mycoolapp.com
+    -heroku domains:add www.mycoolapp.com
+    -heroku config:add -s LD_PRELOAD='/app/node_modules/canvas/cairo/libcairo.so /app/node_modules/canvas/lib/libpixman-1.so.0 /app/node_modules/canvas/lib/libfreetype.so.6' --app my-cool-app
+    -heroku config:add -s LD_LIBRARY_PATH'=/app/node_modules/canvas/cairo' --app my-cool-app
+    -git push heroku master
+
+
+
+config vars:
+
+    
+MONGOLAB_URI:  mongodb://heroku_app8069581:srooksrgtomq4alb2amqcnq25o@ds039037.mongolab.com:39037/heroku_app8069581
+NODE_ENV:      production
+PATH:          bin:node_modules/.bin:/usr/local/bin:/usr/bin:/bin
+SCHEDULER_URL: http://8dsf5gk50slrz46oy9ms02040@heroku-scheduler.herokuapp.com/
