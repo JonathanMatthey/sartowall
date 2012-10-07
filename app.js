@@ -27,6 +27,11 @@ app.configure('production', function(){
   app.use(express.errorHandler());
 });
 
+
+// scraping jobs
+
+node.io scraper-manrep.js
+
 // Routes
 
 // var photoProvider= new PhotoProvider();

@@ -3,6 +3,7 @@ var Connection = require('mongodb').Connection;
 var Server = require('mongodb').Server;
 var BSON = require('mongodb').BSON;
 var ObjectID = require('mongodb').ObjectID;
+var moment = require('moment');
 
 var nodeio = require('node.io');
 var options = {benchmark: true, max: 50, timeout: 10};
@@ -19,6 +20,11 @@ var ctx = outCanvas.getContext('2d');
 
 var async = require('async');
 
+var runOptions;
+
+
+// for each sitemap - 
+
   exports.job = new nodeio.Job(options, {
     input: function(start, num, callback) {
       var self = this;
@@ -28,29 +34,61 @@ var async = require('async');
 
         if(start !== 0) return false; // We only want the input method to run once
 
-        self.getHtml('http://atlantic-pacific.blogspot.com/sitemap.xml', function (err, $) {
-          if (err) self.exit(err);
+        mydb.collection('blogs', {}, function(error, blogCollection) {
+          if( error ) callback(error);
+          else {
+            cursor = blogCollection.find({});
+            cursor.nextObject(function(err, blog) {
+              if(err) throw err;
 
-          var $postLinks = $("loc");
-          var postLinksCount = $postLinks.length;
-          var i;
+              if(blog !== null){ 
 
-          console.log("- found " + postLinksCount + " posts");
-          for (i=postLinksCount - 1; i > postLinksCount - 4; i--){
-            callback([$postLinks[i].children[0].data]);
+                self.getHtml(blog.sitemap, function (err, $) {
+                  if (err) self.exit(err);
+
+                  var $postLinks = $("loc");
+                  var $lastmodDates = $("lastmod");
+                  var postLinksCount = $postLinks.length;
+                  var i;
+
+                  // figure out if xml is ascending or descending
+
+                  var date1 = moment($lastmodDates[0].children[0].data);
+                  var date2 = moment($lastmodDates[1].children[0].data);
+                  console.log(date1.diff(date2));
+                  var sitemapOrder = (date1.diff(date2) > 0) ? "asc": "desc";
+                  console.log(sitemapOrder);
+
+                  console.log("- found " + postLinksCount + " posts");
+                  for (i=postLinksCount - 1; i > postLinksCount - 4; i--){
+                    runOptions = clone(blog);
+                    runOptions.postUrl = $postLinks[i].children[0].data;
+                    // console.log(blog);
+                    callback([ runOptions ]);
+                  }
+                  callback(null, false);
+                });
+
+              }
+              else {
+                mydb.close();
+                self.emit('JOB DONE - GO HOME !')
+              }
+            });
+
           }
-          callback(null, false);
         });
+
       });
 
     }, 
-    run: function (postUrl) {
+    run: function (options) {
 
       var self = this;
 
-      console.log("> scraping: " + postUrl);
+      console.log("> scraping: " + options.postUrl);
 
-      this.getHtml(postUrl, function(err, $) {
+      this.getHtml(options.postUrl, function(err, $) {
         if (err) {
           console.log("ERROR", err);
           self.retry();
@@ -64,8 +102,18 @@ var async = require('async');
           // scrape comments function
           try
           {
-            console.log('> found comments: ' + $(".comment-body p").length);
-            $(".comment-body p").each(function(comment){
+            console.log('> found title: ' + $(options.titleSelector).fulltext);
+            post.title = $(options.titleSelector).fulltext;
+          }
+          catch(err)
+          {
+          }
+
+          // scrape comments function
+          try
+          {
+            console.log('> found comments: ' + $(options.commentSelector).length);
+            $(options.commentSelector).each(function(comment){
               post.comments.push({ "body": stripOutURL(comment.text)});
             });
           }
@@ -75,8 +123,8 @@ var async = require('async');
           
           paletteFns = [];
 
-          console.log("> found photos: " + $(".post-body img").length);
-          $(".post-body img").each(function(img){
+          console.log("> found photos: " + $(options.photoSelector).length);
+          $(options.photoSelector).each(function(img){
             // post.photos.push({src:img.attribs.src});
             paletteFns.push(function(callback){
               paletteImg(callback, {src:img.attribs.src});
@@ -89,7 +137,8 @@ var async = require('async');
               // the results array will equal ['one','two'] even though
               // the second function had a shorter timeout.
               post.photos = results;
-              savePost(function(){ console.log('post saved'); }, post);
+              // console.log(post);
+              // savePost(function(){ console.log('post saved'); }, post);
               self.emit('done !');
           });
 
@@ -101,6 +150,10 @@ var async = require('async');
     }
   });
 
+var clone = (function(){ 
+  return function (obj) { Clone.prototype=obj; return new Clone() };
+  function Clone(){}
+}());
 
 function paletteImg(callback, photo){
 

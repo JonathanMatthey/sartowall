@@ -20,18 +20,21 @@ exports.job = new nodeio.Job(options, {
         photos.push({ src: image.attribs.src });
       });
 
+      console.log(photos);
+      self.emit('lookbook - done');
+
       // connect to DB
-      mydb = new Db('node-mongo-blog', new Server('localhost', 27017, {auto_reconnect: true}, {}));
-      mydb.open(function(){
-        savePhotos(photos, function(error, photo_collection){
-          if( error ) 
-            console.log ('ERROR - do something ! couldnt save photos');
-          else{
-            mydb.close();
-            self.emit(photo_collection);
-          }
-        });
-      });
+      // mydb = new Db('node-mongo-blog', new Server('localhost', 27017, {auto_reconnect: true}, {}));
+      // mydb.open(function(){
+      //   savePhotos(photos, function(error, photo_collection){
+      //     if( error ) 
+      //       console.log ('ERROR - do something ! couldnt save photos');
+      //     else{
+      //       mydb.close();
+      //       self.emit(photo_collection);
+      //     }
+      //   });
+      // });
             // self.emit(photos);
 
     });
