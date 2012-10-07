@@ -12,11 +12,11 @@ var http = require('http')
 
 var mydb;
 
-var palette = require('palette')
-  , Canvas = require('canvas');
+// var palette = require('palette')
+//   , Canvas = require('canvas');
 
-var outCanvas = new Canvas(1000, 750);
-var ctx = outCanvas.getContext('2d');
+// var outCanvas = new Canvas(1000, 750);
+// var ctx = outCanvas.getContext('2d');
 
 var async = require('async');
 
@@ -158,27 +158,43 @@ var runOptions;
                 
                 paletteFns = [];
 
+                // console.log("> found photos: " + $(options.photoSelector).length);
+                // $(options.photoSelector).each(function(img){
+                //   // post.photos.push({src:img.attribs.src});
+                //   paletteFns.push(function(callback){
+                //     paletteImg(callback, {src:img.attribs.src});
+                //   });
+                // });
+
+                // async.parallel(paletteFns,
+                // //  callback when all paletteFns completed
+                // function(err, results){
+                //     // the results array will equal ['one','two'] even though
+                //     // the second function had a shorter timeout.
+                //     post.photos = results;
+
+                //     // Update the document using an upsert operation, ensuring creation if it does not exist
+                //     postCollection.update({_id: post._id}, post, {upsert:true, safe:true}, function(err, result) {
+                //       console.log('= post saved');
+                //       self.emit('done !');
+                //     });
+                // });
+
+                post.photos = [];
+
                 console.log("> found photos: " + $(options.photoSelector).length);
                 $(options.photoSelector).each(function(img){
                   // post.photos.push({src:img.attribs.src});
-                  paletteFns.push(function(callback){
-                    paletteImg(callback, {src:img.attribs.src});
-                  });
+
+                    post.photos.push({src:img.attribs.src});
+                });
+                console.log(post);
+                // Update the document using an upsert operation, ensuring creation if it does not exist
+                postCollection.update({_id: post._id}, post, {upsert:true, safe:true}, function(err, result) {
+                  console.log('= post saved');
+                  self.emit('done !');
                 });
 
-                async.parallel(paletteFns,
-                //  callback when all paletteFns completed
-                function(err, results){
-                    // the results array will equal ['one','two'] even though
-                    // the second function had a shorter timeout.
-                    post.photos = results;
-
-                    // Update the document using an upsert operation, ensuring creation if it does not exist
-                    postCollection.update({_id: post._id}, post, {upsert:true, safe:true}, function(err, result) {
-                      console.log('= post saved');
-                      self.emit('done !');
-                    });
-                });
               }
             });
           }
@@ -197,55 +213,55 @@ var clone = (function(){
   function Clone(){}
 }());
 
-function paletteImg(callback, photo){
+// function paletteImg(callback, photo){
 
-  var regexGroups = photo.src.match(/^((http[s]?|ftp):\/)?\/?([^:\/\s]+)((\/\w+)*\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$/);
+//   var regexGroups = photo.src.match(/^((http[s]?|ftp):\/)?\/?([^:\/\s]+)((\/\w+)*\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$/);
 
-  var host = regexGroups[3]; 
-  var path = regexGroups[4] + regexGroups[6];
+//   var host = regexGroups[3]; 
+//   var path = regexGroups[4] + regexGroups[6];
 
-  http.get(
-    {
-        host: host,
-        port: 80,
-        path: path
-    },
-    function(res) {
-      var data = new Buffer(parseInt(res.headers['content-length'],10));
-      var pos = 0;
-      res.on('data', function(chunk) {
-        chunk.copy(data, pos);
-        pos += chunk.length;
-      });
-      res.on('end', function () {
-        img = new Canvas.Image;
-        img.src = data;
-        ctx.drawImage(img, 0, 0, img.width, img.height);
-        // var x = 0;
-        var colorsArray = [];
-        var colors = palette(outCanvas, 5);
-        colors.forEach(function(color){
-          var r = color[0]
-            , g = color[1]
-            , b = color[2]
-            , val = r << 16 | g << 8 | b
-            , str = '#' + val.toString(16);
-            colorsArray.push({"r" : r, "g" : g, "b" : b, "str" : str});
-        });
+//   http.get(
+//     {
+//         host: host,
+//         port: 80,
+//         path: path
+//     },
+//     function(res) {
+//       var data = new Buffer(parseInt(res.headers['content-length'],10));
+//       var pos = 0;
+//       res.on('data', function(chunk) {
+//         chunk.copy(data, pos);
+//         pos += chunk.length;
+//       });
+//       res.on('end', function () {
+//         img = new Canvas.Image;
+//         img.src = data;
+//         ctx.drawImage(img, 0, 0, img.width, img.height);
+//         // var x = 0;
+//         var colorsArray = [];
+//         var colors = palette(outCanvas, 5);
+//         colors.forEach(function(color){
+//           var r = color[0]
+//             , g = color[1]
+//             , b = color[2]
+//             , val = r << 16 | g << 8 | b
+//             , str = '#' + val.toString(16);
+//             colorsArray.push({"r" : r, "g" : g, "b" : b, "str" : str});
+//         });
 
-        photo.colors = colorsArray;
-        callback(null, photo);
-        // console.log(photo);
+//         photo.colors = colorsArray;
+//         callback(null, photo);
+//         // console.log(photo);
 
-        // var out = fs.createWriteStream(__dirname + '/my-out.png')
-        //   , stream = outCanvas.createPNGStream();
+//         // var out = fs.createWriteStream(__dirname + '/my-out.png')
+//         //   , stream = outCanvas.createPNGStream();
 
-        // stream.on('data', function(chunk){
-        //   out.write(chunk);
-        // });
-      });
-    });
-}
+//         // stream.on('data', function(chunk){
+//         //   out.write(chunk);
+//         // });
+//       });
+//     });
+// }
 
 function stripOutURL(text) {
 
