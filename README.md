@@ -77,3 +77,10 @@ MONGOLAB_URI:  mongodb://heroku_app8069581:srooksrgtomq4alb2amqcnq25o@ds039037.m
 NODE_ENV:      production
 PATH:          bin:node_modules/.bin:/usr/local/bin:/usr/bin:/bin
 SCHEDULER_URL: http://8dsf5gk50slrz46oy9ms02040@heroku-scheduler.herokuapp.com/
+
+
+
+blog entry in mongo
+
+ db.blogs.update({_id: ObjectId("5072e3f0e14ee244a185e87d")},{sitemap:"atlantic-pacific.blogspot.com/sitemap.xml",commentSelector:".comment-body p",titleSelector:".post-title",photoSelector:".post-body img", lastScrapedDate: "2012-09-01T19:20:59Z"})
+
