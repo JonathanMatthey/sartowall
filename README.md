@@ -91,4 +91,13 @@ SCHEDULER_URL: http://8dsf5gk50slrz46oy9ms02040@heroku-scheduler.herokuapp.com/
 
 blog entry in mongo
 
- db.blogs.update({_id: ObjectId("5072e3f0e14ee244a185e87d")},{sitemap:"atlantic-pacific.blogspot.com/sitemap.xml",commentSelector:".comment-body p",titleSelector:".post-title",photoSelector:".post-body img", lastScrapedDate: "2012-09-01T19:20:59Z"})
+ db.blogs.update({_id: ObjectId("5072e3f0e14ee244a185e87d")},{url:"http://atlantic-pacific.blogspot.com",sitemap:"atlantic-pacific.blogspot.com/sitemap.xml",nextPageSelector:".blog-pager-older-link",commentSelector:".comment-body p",titleSelector:".post-title",postSelector:".sIFR-alternate a",photoSelector:".post-body img", lastScrapedDate: "2012-09-01T19:20:59Z"})
+
+
+ db.posts.insert({  "photos" : [{"src" : "http://1.bp.blogspot.com/-a1KbOU51ujg/UHHK85_-K-I/AAAAAAAAFts/b9CnJtGWwUk/s898/1FALL%2BPRINT%2B012.JPG"},{"src" : "http://2.bp.blogspot.com/-mdQbRFEtp5A/UHHLZCmyDPI/AAAAAAAAFt4/fh9e7r6DEh8/s600/1FALL%2BPRINT%2B042.JPG" },{"src" : "http://4.bp.blogspot.com/-8kwY7sTgzAc/UHHL3O1klRI/AAAAAAAAFuE/cqykstc5_Rg/s898/1FALL%2BPRINT%2B018.JPG"}  ],  "comments" : [  ],  "url" : "http://atlantic-pacific.blogspot.com/2012/10/weekend-rain.html#links",  "title" : "fall mix"})
+
+db.blogs.insert(  {      "url" : "http://www.thesartorialist.com",    "sitemap" : "http://www.thesartorialist.com/sitemap.xml",    "nextPageSelector" : ".navigation .alignleft a",    "commentSelector" : ".content-comment p",    "titleSelector" : ".post h2",    "postSelector" : ".post h2 a",    "photoSelector" : ".size-full",    "lastScrapedDate" : "2012-09-01T19:20:59Z"  }  )
+
+db.blogs.insert(    {     "url" : "http://atlantic-pacific.blogspot.com",    "sitemap" : "atlantic-pacific.blogspot.com/sitemap.xml",    "nextPageSelector" : ".blog-pager-older-link",    "commentSelector" : ".comment-body p",    "titleSelector" : ".post-title",    "postSelector" : ".sIFR-alternate a",    "photoSelector" : ".post-body img",    "lastScrapedDate" : "2012-09-01T19:20:59Z"  }  )
+
+
