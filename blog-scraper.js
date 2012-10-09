@@ -176,79 +176,76 @@ var clone = (function(){
 
 function inputProcessing(self,start, num, callback){
 
+  if(start !== 0) return false; // We only want the input method to run once
 
-        if(start !== 0) return false; // We only want the input method to run once
+  mydb.collection('blogs', {}, function(error, blogCollection) {
+    if( error ) callback(error);
+    else {
+      cursor = blogCollection.find({});
+      cursor.nextObject(function(err, blog) {
+        if(err) throw err;
 
-        mydb.collection('blogs', {}, function(error, blogCollection) {
-          if( error ) callback(error);
-          else {
-            cursor = blogCollection.find({});
-            cursor.nextObject(function(err, blog) {
-              if(err) throw err;
+        if(blog !== null){ 
 
-              if(blog !== null){ 
+          self.getHtml(blog.sitemap, function (err, $) {
+            if (err) self.exit(err);
 
-                self.getHtml(blog.sitemap, function (err, $) {
-                  if (err) self.exit(err);
+            var $postLinks = $("loc");
+            var $lastmodDates = $("lastmod");
+            var postLinksCount = $postLinks.length;
+            var i;
+            console.log("- found " + postLinksCount + " posts");
+            console.log("- found " + $lastmodDates.length + " moddates");
 
-                  var $postLinks = $("loc");
-                  var $lastmodDates = $("lastmod");
-                  var postLinksCount = $postLinks.length;
-                  var i;
-                  console.log("- found " + postLinksCount + " posts");
-                  console.log("- found " + $lastmodDates.length + " moddates");
+            // figure out if xml is ascending or descending
+            var firstDate = moment($lastmodDates[0].children[0].data);
+            var lastDate = moment($lastmodDates[$lastmodDates.length-1].children[0].data);
+            var lastScrapedDate = moment(blog.lastScrapedDate);
 
-                  // figure out if xml is ascending or descending
-                  var firstDate = moment($lastmodDates[0].children[0].data);
-                  var lastDate = moment($lastmodDates[$lastmodDates.length-1].children[0].data);
-                  var lastScrapedDate = moment(blog.lastScrapedDate);
+            if (firstDate.diff(lastScrapedDate,'days') > 0 )
+            {
+              i = $lastmodDates.length-1;
+              // sitemap is in descending order
 
-                  if (firstDate.diff(lastScrapedDate,'days') > 0 )
-                  {
-                    i = $lastmodDates.length-1;
-                    // sitemap is in descending order
+            }
 
-                  }
+            if (lastDate.diff(lastScrapedDate) >= 0 )
+            {
+              // sitemap is in ascending order
+              i = $lastmodDates.length-1;
 
-                  if (lastDate.diff(lastScrapedDate) >= 0 )
-                  {
-                    // sitemap is in ascending order
-                    i = $lastmodDates.length-1;
+              // check for changes newer than last checked date for this blog
+              while( i >= 0 && lastDate.diff(lastScrapedDate) >= 0 ){
 
-                    // check for changes newer than last checked date for this blog
-                    while( i >= 0 && lastDate.diff(lastScrapedDate) >= 0 ){
+                // // check if post 
+                // var url = $postLinks[i].children[0].data;
+                // postCollection.findOne({url: url}, function(error, result) {
+                //   if( error ) callback(error)
+                //   else{
+                //     if (result == null){
 
-                      // // check if post 
-                      // var url = $postLinks[i].children[0].data;
-                      // postCollection.findOne({url: url}, function(error, result) {
-                      //   if( error ) callback(error)
-                      //   else{
-                      //     if (result == null){
-
-                      runOptions = clone(blog);
-                      runOptions.url = $postLinks[i].children[0].data;
-                      callback([ runOptions ]);
-                      i--;
-                      lastDate = moment($lastmodDates[i].children[0].data);
-                    }
-                  }
-                  // update blog last modified date to now as we just checked it
-                  blog.lastScrapedDate = moment().format("YYYY-MM-DDTHH:mm:ss z");
-                  blogCollection.update({_id: blog._id}, blog, {safe:true}, function(err, result) {
-                    console.log('= blog saved');
-                    callback(null,false);
-                  });
-
-                });
+                runOptions = clone(blog);
+                runOptions.url = $postLinks[i].children[0].data;
+                callback([ runOptions ]);
+                i--;
+                lastDate = moment($lastmodDates[i].children[0].data);
               }
-              else {
-                self.emit('NO MORE BLOGS - GO HOME !')
-              }
+            }
+            // update blog last modified date to now as we just checked it
+            blog.lastScrapedDate = moment().format("YYYY-MM-DDTHH:mm:ss z");
+            blogCollection.update({_id: blog._id}, blog, {safe:true}, function(err, result) {
+              console.log('= blog saved');
+              callback(null,false);
             });
 
-          }
-        });
-
+          });
+        }
+        else {
+          self.emit('NO MORE BLOGS - GO HOME !')
+        }
+      });
+    }
+  });
 }
 
 // function paletteImg(callback, photo){

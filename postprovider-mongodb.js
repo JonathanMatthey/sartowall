@@ -38,6 +38,8 @@ PostProvider = function(host, port) {
 };
 
 PostProvider.prototype.getCollection= function(callback) {
+  console.log('this.db:' );
+  console.log(this.db);
   this.db.collection('posts', function(error, photo_collection) {
     if( error ) callback(error);
     else callback(null, photo_collection);
