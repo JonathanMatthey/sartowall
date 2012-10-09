@@ -57,8 +57,8 @@ var runOptions;
   else{
     // local connect
     mydb= new Db('node-mongo-blog', new Server('localhost', 27017, {auto_reconnect: true}, {}));
-  }
       inputProcessing(self,start, num, callback);
+  }
 
 
     }, 

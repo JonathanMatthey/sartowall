@@ -68,12 +68,10 @@ deploy:
     -heroku config:add -s LD_LIBRARY_PATH'=/app/node_modules/canvas/cairo' --app sartowall
     -git push heroku master
 
-
-
 config vars:
-
 
 MONGOLAB_URI:  mongodb://heroku_app8069581:srooksrgtomq4alb2amqcnq25o@ds039037.mongolab.com:39037/heroku_app8069581
 NODE_ENV:      production
 PATH:          bin:node_modules/.bin:/usr/local/bin:/usr/bin:/bin
 SCHEDULER_URL: http://8dsf5gk50slrz46oy9ms02040@heroku-scheduler.herokuapp.com/
+
