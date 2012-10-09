@@ -158,13 +158,13 @@ function inputProcessing(self, start, num, callback){
             if(err) throw err;
             if(blogs !== null){ 
               for (var i=0;i<blogs.length;i++){
-                blog = blogs[i];
+                blog = jQuery.extend(true,{},blogs[i]);
                 // recursively extract all posts URLs by traversing through OLDER POSTS / NEXT PAGE link on each page until you find a post you already have
                 // returns all postsUrls to scrape in postUrlToScrape
                 scrapeNewPostUrls(self, postCollection, blog.url, blog, postsUrlToScrape, function(blog, postsUrlToScrape){
                   console.log("\n[ %d new posts ] %s", postsUrlToScrape.length, blog.name);
                   for (i=0;i<postsUrlToScrape.length;i++){
-                    runOptions = jQuery.extend(true, {}, blog);
+                    runOptions = blog;
                     runOptions.url = postsUrlToScrape[i];
                     callback([ runOptions ]);
                   }
