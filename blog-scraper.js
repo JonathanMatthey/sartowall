@@ -82,7 +82,10 @@ var runOptions;
           if( error ) callback(error);
           else {
             postCollection.findOne({url: options.url}, function(error, result) {
-              if( error ) callback(error)
+              if( error ) {
+              console.log(error);
+              return false;//callback(error)
+            }
               else{
                 if (result == null){
                   var post = {};
