@@ -52,9 +52,9 @@ app.get('/color/r/:r/g/:g/b/:b', function(req, res){
 
     postProvider.find(
       {
-        "photos.colors.r": {$gt:r-colorAccuracy, $lt:r+colorAccuracy},
-        "photos.colors.g": {$gt:g-colorAccuracy, $lt:g+colorAccuracy},
-        "photos.colors.b": {$gt:b-colorAccuracy, $lt:b+colorAccuracy}
+        // "photos.colors.r": {$gt:r-colorAccuracy, $lt:r+colorAccuracy},
+        // "photos.colors.g": {$gt:g-colorAccuracy, $lt:g+colorAccuracy},
+        // "photos.colors.b": {$gt:b-colorAccuracy, $lt:b+colorAccuracy}
       },function(err, posts){
         res.render('index.jade', { 
             title: 'sartowall',

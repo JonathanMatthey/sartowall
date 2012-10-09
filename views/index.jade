@@ -3,8 +3,6 @@ extends layout
 block mainContent
   header
     h1= title
-    -if(r) 
-    div.selected-color(style="background-color:rgb(" + r + "," + g + "," + b + ")")
   #container
     #photos.isotope
       - each post in posts
@@ -24,14 +22,6 @@ block mainContent
             dl
               - each comment in post.comments
                 dd #{comment.body}
-        div.colorways-container
-          - each photo in post.photos
-            div.colorways
-              a.colorway(r=photo.colors[0].r,g=photo.colors[0].g,b=photo.colors[0].b,style="background-color:"+photo.colors[0].str)
-              a.colorway(r=photo.colors[1].r,g=photo.colors[1].g,b=photo.colors[1].b,style="background-color:"+photo.colors[1].str)
-              a.colorway(r=photo.colors[2].r,g=photo.colors[2].g,b=photo.colors[2].b,style="background-color:"+photo.colors[2].str)
-              a.colorway(r=photo.colors[3].r,g=photo.colors[3].g,b=photo.colors[3].b,style="background-color:"+photo.colors[3].str)
-              a.colorway(r=photo.colors[4].r,g=photo.colors[4].g,b=photo.colors[4].b,style="background-color:"+photo.colors[4].str)
 
 
   #overlay
