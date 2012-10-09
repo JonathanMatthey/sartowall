@@ -8,6 +8,7 @@ var Connection = require('mongodb').Connection;
 var Server = require('mongodb').Server;
 var BSON = require('mongodb').BSON;
 var ObjectID = require('mongodb').ObjectID;
+var jQuery = require('jquery');
 
 var moment = require('moment');
 
@@ -103,10 +104,24 @@ exports.job = new nodeio.Job(options, {
 
             post.photos = [];
 
-            $(options.photoSelector).each(function(img){
-              // post.photos.push({src:img.attribs.src});
-                post.photos.push({src:img.attribs.src});
-            });
+            // scrape photos
+            try
+            {
+              // if undefined - there only was 1 photo on the page
+              if ( $(options.photoSelector).length == undefined ){
+                post.photos.push({src:$(options.photoSelector).attribs.src});
+              }
+              else{
+                $(options.photoSelector).each(function(img){
+                  // post.photos.push({src:img.attribs.src});
+                    post.photos.push({src:img.attribs.src});
+                });
+              }
+            }
+            catch(err)
+            {
+            }
+
             // Update the document using an upsert operation, ensuring creation if it does not exist
             postCollection.update({_id: post._id}, post, {upsert:true, safe:true}, function(err, result) {
               process.stdout.write(".");
@@ -124,7 +139,11 @@ exports.job = new nodeio.Job(options, {
   }
 });
 
-function inputProcessing(self,start, num, callback){
+function inputProcessing(self, start, num, callback){
+  var blogIndex = 0;
+  var blog;
+  var postsUrlToScrape = [];
+  var runOptions;
 
   if(start !== 0) return false; // We only want the input method to run once
 
@@ -132,60 +151,55 @@ function inputProcessing(self,start, num, callback){
     if( error ) callback(error);
     else {
       cursor = blogCollection.find({});
-      cursor.nextObject(function(err, blog) {
-        if(err) throw err;
-
-        if(blog !== null){ 
-
-          var postsUrlToScrape = [];
-
-          mydb.collection('posts', {}, function(error, postCollection) {
-            if( error ) callback(error);
+      mydb.collection('posts', {}, function(error, postCollection) {
+        if( error ) callback(error);
+        else {
+          cursor.toArray(function(err, blogs) {
+            if(err) throw err;
+            if(blogs !== null){ 
+              for (var i=0;i<blogs.length;i++){
+                blog = blogs[i];
+                // recursively extract all posts URLs by traversing through OLDER POSTS / NEXT PAGE link on each page until you find a post you already have
+                // returns all postsUrls to scrape in postUrlToScrape
+                scrapeNewPostUrls(self, postCollection, blog.url, blog, postsUrlToScrape, function(postsUrlToScrape){
+                  console.log("\n[ %d new posts ] %s", postsUrlToScrape.length, blog.name);
+                  for (i=0;i<postsUrlToScrape.length;i++){
+                    runOptions = jQuery.extend(true, {}, blog);
+                    runOptions.url = postsUrlToScrape[i];
+                    callback([ runOptions ]);
+                  }
+                  blogIndex ++;
+                  if (blogIndex == blogs.length ){
+                    callback(null,null);
+                  }
+                });
+              }
+            }
             else {
-              // recursively extract all posts URLs by traversing through OLDER POSTS / NEXT PAGE link on each page until you find a post you already have
-              // returns all postsUrls to scrape in postUrlToScrape
-              scrapeNewPostUrls(self, postCollection, blog.url, blog.nextPageSelector, postsUrlToScrape, function(postsUrlToScrape){
-                
-                var runOptions;
-                console.log("%s - [ %d new posts ]", blog.name, postsUrlToScrape.length);
-                for (i=0;i<postsUrlToScrape.length;i++){
-                  runOptions = clone(blog);
-                  runOptions.url = postsUrlToScrape[i];
-                  callback([ runOptions ]);
-                }
-                callback(null,false);
-              });
+              self.emit('NO MORE BLOGS - GO HOME !')
             }
           });
-
-        }
-        else {
-          self.emit('NO MORE BLOGS - GO HOME !')
         }
       });
     }
   });
 }
 
-var clone = (function(){ 
-  return function (obj) { Clone.prototype=obj; return new Clone() };
-  function Clone(){}
-}());
+var maxPostsToScrape = 10;
+var i = 0;
 
 // recursively extract all posts URLs by traversing through OLDER POSTS / NEXT PAGE link on each page until you find a post you already have
 // returns all postsUrls to scrape in param1 of callback
-function scrapeNewPostUrls(self, postCollection, pageUrl, nextPageSelector, postsUrlToScrape, callback){
+function scrapeNewPostUrls(self, postCollection, pageUrl, blog, postsUrlToScrape, callback){
 
   self.getHtml(pageUrl, function (err, $) {
     if (err) self.exit(err);
 
-    var postSelector = ".post-backlinks a";
+    var postSelector = blog.postSelector;
     var postUrls = [];
 
     var findNewPostsFns = [];
-
     $(postSelector).each(function(postUrlObj){
-      console.log(">"+postUrlObj.attribs.href);
       findNewPostsFns.push(function(callback){
         findNewPostsUrls(postCollection, postUrlObj.attribs.href, callback);
       });
@@ -203,6 +217,7 @@ function scrapeNewPostUrls(self, postCollection, pageUrl, nextPageSelector, post
           else{
             postsUrlToScrape.push(results[i]);
           }
+
         }
 
         // if found an existing post - stop here, dont traverse to next page, just return all the posts you found so far
@@ -210,11 +225,17 @@ function scrapeNewPostUrls(self, postCollection, pageUrl, nextPageSelector, post
           callback(postsUrlToScrape);
         }
         else{
-          console.log(pageUrl);
-          // keep traversing to next page of blog
-          var nextPageUrl = $(nextPageSelector).attribs.href;
 
-          scrapeNewPostUrls(self, postCollection, nextPageUrl, nextPageSelector, postsUrlToScrape,callback);
+          if(postsUrlToScrape.length > maxPostsToScrape){
+            callback(postsUrlToScrape);
+          }
+          else{
+          // keep traversing to next page of blog
+          var nextPageUrl = $(blog.nextPageSelector).attribs.href;
+
+          scrapeNewPostUrls(self, postCollection, nextPageUrl, blog, postsUrlToScrape,callback);
+
+          }
         }
       }
     );
