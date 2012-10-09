@@ -9,10 +9,11 @@ var Connection = require('mongodb').Connection;
 var Server = require('mongodb').Server;
 var BSON = require('mongodb').BSON;
 var ObjectID = require('mongodb').ObjectID;
+var host;
+var post;
 
-PostProvider = function(host, port) {
-  // heroku connect
-  if (process.env.MONGOLAB_URI !== undefined ){
+function connectToMongoDB(callback){
+    if (process.env.MONGOLAB_URI !== undefined ){
 
     var mongostr = process.env.MONGOLAB_URI;
 
@@ -28,19 +29,54 @@ PostProvider = function(host, port) {
       this.db.addListener("error", function(error){
         console.log("Error connecting to MongoLab");
       });
+      callback();
     });
   }
   else{
     // local connect
     this.db= new Db('node-mongo-blog', new Server(host, port, {auto_reconnect: true}, {}));
-    this.db.open(function(){});
+    this.db.open(function(){
+      callback();
+    });
   }
+}
+
+PostProvider = function(host2, port2) {
+  // heroku connect
+  host = host2;
+  port = port2;
+
+  // if (process.env.MONGOLAB_URI !== undefined ){
+
+  //   var mongostr = process.env.MONGOLAB_URI;
+
+  //   mongo.connect(mongostr, {}, function(error, db)
+  //   {       
+  //     console.log('error');
+  //     console.log(error);
+  //     console.log('db');
+  //     console.log("connected, db: " + db);
+
+  //     this.db = db;
+
+  //     this.db.addListener("error", function(error){
+  //       console.log("Error connecting to MongoLab");
+  //     });
+  //   });
+  // }
+  // else{
+  //   // local connect
+  //   this.db= new Db('node-mongo-blog', new Server(host, port, {auto_reconnect: true}, {}));
+  //   this.db.open(function(){});
+  // }
 };
 
 PostProvider.prototype.getCollection= function(callback) {
-  this.db.collection('posts', function(error, photo_collection) {
-    if( error ) callback(error);
-    else callback(null, photo_collection);
+  connectToMongoDB(function(){
+    this.db.collection('posts', function(error, photo_collection) {
+      if( error ) callback(error);
+      else callback(null, photo_collection);
+    });
   });
 };
 

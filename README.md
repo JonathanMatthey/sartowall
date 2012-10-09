@@ -68,12 +68,21 @@ deploy:
     -heroku config:add -s LD_LIBRARY_PATH'=/app/node_modules/canvas/cairo' --app sartowall
     -git push heroku master
 
-
-
 config vars:
 
-
 MONGOLAB_URI:  mongodb://heroku_app8069581:srooksrgtomq4alb2amqcnq25o@ds039037.mongolab.com:39037/heroku_app8069581
+
+
+
+
+
+//    div.selected-color(style="background-color:rgb(" + r + "," + g + "," + b + ")")
+
+//              a.colorway(r=photo.colors[0].r,g=photo.colors[0].g,b=photo.colors[0].b,style="background-color:"+photo.colors[0].str)
+//              a.colorway(r=photo.colors[1].r,g=photo.colors[1].g,b=photo.colors[1].b,style="background-color:"+photo.colors[1].str)
+//              a.colorway(r=photo.colors[2].r,g=photo.colors[2].g,b=photo.colors[2].b,style="background-color:"+photo.colors[2].str)
+//              a.colorway(r=photo.colors[3].r,g=photo.colors[3].g,b=photo.colors[3].b,style="background-color:"+photo.colors[3].str)
+//              a.colorway(r=photo.colors[4].r,g=photo.colors[4].g,b=photo.colors[4].b,style="background-color:"+photo.colors[4].str)
 NODE_ENV:      production
 PATH:          bin:node_modules/.bin:/usr/local/bin:/usr/bin:/bin
 SCHEDULER_URL: http://8dsf5gk50slrz46oy9ms02040@heroku-scheduler.herokuapp.com/
@@ -83,4 +92,3 @@ SCHEDULER_URL: http://8dsf5gk50slrz46oy9ms02040@heroku-scheduler.herokuapp.com/
 blog entry in mongo
 
  db.blogs.update({_id: ObjectId("5072e3f0e14ee244a185e87d")},{sitemap:"atlantic-pacific.blogspot.com/sitemap.xml",commentSelector:".comment-body p",titleSelector:".post-title",photoSelector:".post-body img", lastScrapedDate: "2012-09-01T19:20:59Z"})
-
