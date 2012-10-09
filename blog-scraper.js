@@ -164,7 +164,7 @@ function inputProcessing(self, start, num, callback){
                 scrapeNewPostUrls(self, postCollection, blog.url, blog, postsUrlToScrape, function(blog, postsUrlToScrape){
                   console.log("\n[ %d new posts ] %s", postsUrlToScrape.length, blog.name);
                   for (i=0;i<postsUrlToScrape.length;i++){
-                    runOptions = blog;
+                    runOptions = jQuery.extend(true,{},blog);
                     runOptions.url = postsUrlToScrape[i];
                     callback([ runOptions ]);
                   }
