@@ -57,7 +57,10 @@ var runOptions;
   else{
     // local connect
     mydb= new Db('node-mongo-blog', new Server('localhost', 27017, {auto_reconnect: true}, {}));
+      mydb.open(function(){
       inputProcessing(self,start, num, callback);
+    });
+
   }
 
 
@@ -173,7 +176,6 @@ var clone = (function(){
 
 function inputProcessing(self,start, num, callback){
 
-      mydb.open(function(){
 
         if(start !== 0) return false; // We only want the input method to run once
 
@@ -247,7 +249,6 @@ function inputProcessing(self,start, num, callback){
           }
         });
 
-      });
 }
 
 // function paletteImg(callback, photo){
