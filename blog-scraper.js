@@ -169,6 +169,7 @@ function inputProcessing(self, start, num, callback){
                     callback([ runOptions ]);
                   }
                   blogIndex ++;
+                  console.log('172');
                   if (blogIndex == blogs.length ){
                     callback(null,null);
                   }
