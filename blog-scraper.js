@@ -32,12 +32,11 @@ var runOptions;
 exports.job = new nodeio.Job(options, {
   input: function(start, num, callback) {
     var self = this;
-    console.log('35');
+
     // heroku connect
     if (process.env.MONGOLAB_URI !== undefined ){
 
       var mongostr = process.env.MONGOLAB_URI;
-    console.log('40');
 
       mongo.connect(mongostr, {}, function(error, db)
       {       
@@ -51,7 +50,6 @@ exports.job = new nodeio.Job(options, {
         mydb.addListener("error", function(error){
           console.log("Error connecting to MongoLab");
         });
-    console.log('54');
 
         inputProcessing(self,start, num, callback);
 
@@ -66,7 +64,6 @@ exports.job = new nodeio.Job(options, {
     }
   }, 
   run: function (options) {
-    console.log('69');
 
     var self = this;
 
@@ -147,25 +144,21 @@ function inputProcessing(self, start, num, callback){
   var blog;
   var postsUrlToScrape = [];
   var runOptions;
-    console.log('149');
 
   if(start !== 0) return false; // We only want the input method to run once
 
   mydb.collection('blogs', {}, function(error, blogCollection) {
     if( error ) callback(error);
     else {
-    console.log('156');
       cursor = blogCollection.find({});
       mydb.collection('posts', {}, function(error, postCollection) {
         if( error ) callback(error);
         else {
-    console.log('161');
           cursor.toArray(function(err, blogs) {
             if(err) throw err;
             if(blogs !== null){ 
               for (var i=0;i<blogs.length;i++){
                 blog = blogs[i];
-    console.log('167');
                 // recursively extract all posts URLs by traversing through OLDER POSTS / NEXT PAGE link on each page until you find a post you already have
                 // returns all postsUrls to scrape in postUrlToScrape
                 scrapeNewPostUrls(self, postCollection, blog.url, blog, postsUrlToScrape, function(postsUrlToScrape){
@@ -173,11 +166,9 @@ function inputProcessing(self, start, num, callback){
                   for (i=0;i<postsUrlToScrape.length;i++){
                     runOptions = jQuery.extend(true, {}, blog);
                     runOptions.url = postsUrlToScrape[i];
-    console.log('175');
                     callback([ runOptions ]);
                   }
                   blogIndex ++;
-                  console.log('172');
                   if (blogIndex == blogs.length ){
                     callback(null,null);
                   }
