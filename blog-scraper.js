@@ -161,7 +161,7 @@ function inputProcessing(self, start, num, callback){
                 blog = blogs[i];
                 // recursively extract all posts URLs by traversing through OLDER POSTS / NEXT PAGE link on each page until you find a post you already have
                 // returns all postsUrls to scrape in postUrlToScrape
-                scrapeNewPostUrls(self, postCollection, blog.url, blog, postsUrlToScrape, function(postsUrlToScrape){
+                scrapeNewPostUrls(self, postCollection, blog.url, blog, postsUrlToScrape, function(blog, postsUrlToScrape){
                   console.log("\n[ %d new posts ] %s", postsUrlToScrape.length, blog.name);
                   for (i=0;i<postsUrlToScrape.length;i++){
                     runOptions = jQuery.extend(true, {}, blog);
@@ -222,12 +222,12 @@ function scrapeNewPostUrls(self, postCollection, pageUrl, blog, postsUrlToScrape
 
         // if found an existing post - stop here, dont traverse to next page, just return all the posts you found so far
         if (existingPostFound){
-          callback(postsUrlToScrape);
+          callback(blog, postsUrlToScrape);
         }
         else{
 
           if(postsUrlToScrape.length > maxPostsToScrape){
-            callback(postsUrlToScrape);
+            callback(blog, postsUrlToScrape);
           }
           else{
           // keep traversing to next page of blog
