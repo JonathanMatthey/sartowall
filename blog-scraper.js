@@ -29,7 +29,7 @@ var async = require('async');
 
 var runOptions;
 
-var maxPostsToScrape = 30;
+var maxPostsToScrape = 202;
 var i = 0;
 
 exports.job = new nodeio.Job(options, {
