@@ -29,6 +29,9 @@ var async = require('async');
 
 var runOptions;
 
+var maxPostsToScrape = 30;
+var i = 0;
+
 exports.job = new nodeio.Job(options, {
   input: function(start, num, callback) {
     var self = this;
@@ -184,9 +187,6 @@ function inputProcessing(self, start, num, callback){
     }
   });
 }
-
-var maxPostsToScrape = 10;
-var i = 0;
 
 // recursively extract all posts URLs by traversing through OLDER POSTS / NEXT PAGE link on each page until you find a post you already have
 // returns all postsUrls to scrape in param1 of callback
