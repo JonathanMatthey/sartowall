@@ -14,6 +14,12 @@ $(document).ready(function() {
     });
   });
 
+$("img.lazy").lazyload();
+
+   // $("img.photo").lazyload({
+   //     effect       : "fadeIn"
+   // });
+
   $("a.photo-link").click(function(evt){
     evt.preventDefault();
     var leftOffset = $(this).parent().position().left - ($(".zoomed-in").width() / 2 ) + ($(this).width() * 2);

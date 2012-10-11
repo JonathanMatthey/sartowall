@@ -5,12 +5,16 @@ block mainContent
     h1= title
   #container
     #photos.isotope
-      - each post in posts
+      - each post, i in posts
         - each photo in post.photos
           div.photo-wrapper.isotope-item
             //- div.title 
             a.photo-link(href="#", data-post-id=post._id)
-              img.photo(src=photo.src, alt='')
+              if (i > 10)
+                img.photo(src="images/photo-placeholder.jpg", data-original=photo.src,  alt='', class="lazy")
+              else
+                img.photo(src=photo.src, alt='', class="")
+
 
   #side-panel
     div.details
